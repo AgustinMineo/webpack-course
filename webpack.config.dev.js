@@ -1,9 +1,10 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const CssMinimizerPlugin = require ('css-minimizer-webpack-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
 const Dotenv = require('dotenv-webpack');
+const BundleAnalizerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+
 module.exports = {
     entry : './src/index.js',  //Punto de entrada de la app
     output : {
@@ -12,7 +13,8 @@ module.exports = {
         assetModuleFilename: 'assets/images/[hash][ext][query]'
     },
     mode: 'development',
-    watch: true,
+    //watch: true, No es necesario con la config del devServer
+    devtool : 'source-map', // Nos permite generar un mapa del codigo en formato json, identificado todas las partes del project.
     resolve: {
         extensions:['.js'],
         alias:{//alias --> Se utilizan para acotar las rutas a las carpetas y no tenes que generar un assets/images/github.png
@@ -76,5 +78,12 @@ module.exports = {
             ]
         }),
         new Dotenv(),
-    ]
+        new BundleAnalizerPlugin(), //Se utiliza para analizar posibles mejoras en el codigo --> se ejecuta de la siguiente forma --> npx webpack --profile --json | Out-file 'stats.json' -Encoding OEM (Guarda en un json el output) y para ejecutar el analisis se realiza de la siguiente manera : npx webpack-bundle-analyzer stats.json 
+    ],
+    devServer :{//Build local server for dev instanst
+        static : path.join(__dirname,'dist'),
+        compress:true,
+        historyApiFallback: true,
+        port:3005,
+    },
 }
